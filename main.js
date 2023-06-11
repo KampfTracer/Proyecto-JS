@@ -1,8 +1,8 @@
-let seguir = true;
+let prestamo = true;
 
 // Función principal para calcular el préstamo
 const calcularPrestamo = () => {
-  while (seguir) {
+  while (prestamo) {
     // Solicitar al usuario el monto del préstamo
     let monto = parseFloat(prompt("Ingrese el monto del préstamo:"));
     
@@ -20,7 +20,7 @@ const calcularPrestamo = () => {
 
     // Llamar a la función para calcular la cuota mensual del préstamo
     calcularCuota(monto, interes, plazo);
-    seguir = false; // Salir del ciclo while
+    prestamo = false; // Salir del ciclo while
   }
 };
 
