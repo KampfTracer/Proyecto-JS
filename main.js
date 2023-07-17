@@ -1,201 +1,208 @@
-let prestamo = true; // Variable que indica si se debe seguir solicitando préstamos
-
-// Definición de la clase Usuario
+// Crear la clase Usuario
 class Usuario {
-  constructor(nombre, email, edad) {
+  constructor(nombre, apellido, email, edad, montoPrestamo, plazo, tasaInteres, cuotaMensual, dni) {
     this.nombre = nombre;
+    this.apellido = apellido;
     this.email = email;
     this.edad = edad;
-    this.montoPrestamo = 0;
-    this.plazo = 0;
-    this.tasaInteres = 0;
-    this.cuotaMensual = 0;
-  }
-
-  mostrarDatos() {
-    console.log(`Nombre: ${this.nombre}`);
-    console.log(`Email: ${this.email}`);
-    console.log(`Edad: ${this.edad}`);
-    console.log(`Monto del préstamo: $${this.montoPrestamo.toFixed(2)}`);
-    console.log(`Plazo del préstamo: ${this.plazo} meses`);
-    console.log(`Tasa de interés anual: ${this.tasaInteres}%`);
-    console.log(`Cuota mensual: $${this.cuotaMensual.toFixed(2)}`);
+    this.montoPrestamo = montoPrestamo;
+    this.plazo = plazo;
+    this.tasaInteres = tasaInteres;
+    this.cuotaMensual = cuotaMensual;
+    this.dni = dni;
   }
 }
 
 // Arreglo para almacenar los usuarios registrados
-const usuarios = [];
+let curso = [];
 
-// Función para solicitar el monto del préstamo
-const solicitarMonto = () => {
-  let monto;
+// Función para agregar un usuario
+function agregarUsuario(event) {
+  event.preventDefault();
 
-  while (true) {
-    monto = parseFloat(prompt("Ingrese el monto del préstamo:"));
+  const nombre = document.getElementById("nombre").value;
+  const apellido = document.getElementById("apellido").value;
+  const email = document.getElementById("email").value;
+  const edad = document.getElementById("edad").value;
+  const montoPrestamo = document.getElementById("montoPrestamo").value;
+  const plazo = document.getElementById("plazo").value;
+  const tasaInteres = document.getElementById("tasaInteres").value;
+  const cuotaMensual = calcularCuotaMensual(montoPrestamo, plazo, tasaInteres);
+  const dni = document.getElementById("dni").value;
 
-    if (isNaN(monto)) {
-      alert("Ingrese un valor numérico válido.");
-    } else {
-      break;
-    }
+  if (!nombre || !apellido || !email || !edad || !montoPrestamo || !plazo || !tasaInteres || !dni) {
+    document.getElementById("mensaje").textContent = "Debe ingresar todos los datos del usuario";
+    return;
   }
 
-  return monto;
-};
-
-// Función para solicitar la tasa de interés anual
-const solicitarInteres = () => {
-  let interes;
-
-  while (true) {
-    interes = parseFloat(prompt("Ingrese el interés anual del préstamo (%):"));
-
-    if (isNaN(interes)) {
-      alert("Ingrese un valor numérico válido.");
-    } else {
-      break;
-    }
+  if (dniDuplicado(dni)) {
+    document.getElementById("mensaje").textContent = "Ya existe un usuario con ese DNI";
+    return;
   }
 
-  return interes;
-};
-
-// Función para solicitar el plazo del préstamo en meses
-const solicitarPlazo = () => {
-  let plazo;
-
-  while (true) {
-    plazo = parseInt(prompt("Ingrese el plazo del préstamo (en meses):"));
-
-    if (isNaN(plazo)) {
-      alert("Ingrese un valor numérico válido.");
-    } else {
-      break;
-    }
+  if (!validarEmail(email)) {
+    document.getElementById("mensaje").textContent = "Ingrese un correo electrónico válido";
+    return;
   }
 
-  return plazo;
-};
+  const nuevoUsuario = new Usuario(nombre, apellido, email, edad, montoPrestamo, plazo, tasaInteres, cuotaMensual, dni);
 
-// Función para registrar un nuevo usuario y calcular el préstamo
-const registrarYCalcularPrestamo = () => {
-  let nombre = ingresarNombre();
-  let email = ingresarEmail();
-  let edad = ingresarEdad();
+  curso.push(nuevoUsuario);
+  guardarEnLocalStorage();
+  document.getElementById("mensaje").textContent = "Se agregó correctamente el usuario";
 
-  // Función para ingresar el nombre del usuario
-  function ingresarNombre() {
-    while (true) {
-      let nombre = prompt("Ingrese su nombre:");
+  // Reiniciar los campos del formulario
+  document.getElementById("nombre").value = "";
+  document.getElementById("apellido").value = "";
+  document.getElementById("email").value = "";
+  document.getElementById("edad").value = "";
+  document.getElementById("montoPrestamo").value = "";
+  document.getElementById("plazo").value = "";
+  document.getElementById("tasaInteres").value = "";
+  document.getElementById("dni").value = "";
 
-      if (!nombre) {
-        alert("El nombre no puede estar vacío.");
-      } else {
-        return nombre;
-      }
-    }
+  listarUsuarios();
+}
+
+// Función para verificar si el DNI está duplicado
+function dniDuplicado(dni) {
+  return curso.some((usuario) => usuario.dni === dni);
+}
+
+// Función para calcular la cuota mensual
+function calcularCuotaMensual(monto, plazo, tasaInteres) {
+  const tasaMensual = tasaInteres / 100 / 12;
+  return (monto * tasaMensual) / (1 - Math.pow(1 + tasaMensual, -plazo));
+}
+
+// Función para validar el formato del correo electrónico
+function validarEmail(email) {
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+}
+
+// Cargar datos desde el localStorage al array curso
+function cargarDesdeLocalStorage() {
+  const usuariosGuardados = localStorage.getItem("curso");
+  if (usuariosGuardados) {
+    curso = JSON.parse(usuariosGuardados);
   }
+}
 
-  // Función para ingresar el email del usuario
-  function ingresarEmail() {
-    while (true) {
-      let email = prompt("Ingrese su email:");
+// Guardar datos del array curso en el localStorage
+function guardarEnLocalStorage() {
+  localStorage.setItem("curso", JSON.stringify(curso));
+}
 
-      if (!email) {
-        alert("El email no puede estar vacío.");
-      } else if (!validarEmail(email)) {
-        alert("Ingrese un email válido.");
-      } else {
-        return email;
-      }
-    }
-  }
+// Función para eliminar un usuario del array curso
+function eliminarUsuario(index) {
+  curso.splice(index, 1);
+  guardarEnLocalStorage();
+  listarUsuarios();
+}
 
-  // Función para ingresar la edad del usuario
-  function ingresarEdad() {
-    while (true) {
-      let edad = parseInt(prompt("Ingrese su edad:"));
+// Función para mostrar la lista de usuarios en el DOM
+function listarUsuarios() {
+  const contenedorUsuarios = document.getElementById("usuariosContainer");
+  contenedorUsuarios.innerHTML = "";
 
-      if (isNaN(edad)) {
-        alert("Ingrese un valor numérico para su edad.");
-      } else {
-        return edad;
-      }
-    }
-  }
-
-  // Función para validar el formato del email
-  function validarEmail(email) {
-    return /^[\w-]+(\.[\w-]+)*@([\w-]+\.)+[a-zA-Z]{2,7}$/.test(email);
-  }
-
-  // Solicitar los datos del préstamo
-  let monto = solicitarMonto();
-  let interes = solicitarInteres();
-  let plazo = solicitarPlazo();
-
-  // Crear una instancia del usuario
-  const usuario = new Usuario(nombre, email, edad);
-  usuario.montoPrestamo = monto;
-  usuario.plazo = plazo;
-  usuario.tasaInteres = interes;
-
-  // Calcular la cuota mensual
-  let tasaInteres = interes / 100 / 12;
-  usuario.cuotaMensual = (monto * tasaInteres) / (1 - Math.pow(1 + tasaInteres, -plazo));
-
-  // Agregar el usuario al arreglo de usuarios
-  usuarios.push(usuario);
-
-  // Mostrar mensaje de usuario registrado exitosamente
-  alert("¡Usuario registrado exitosamente!");
-};
-
-// Función para mostrar los usuarios registrados
-const mostrarUsuarios = () => {
-  if (usuarios.length === 0) {
-    alert("Aún no se han registrado usuarios.");
+  if (curso.length === 0) {
+    const mensaje = document.createElement("p");
+    mensaje.textContent = "No hay usuarios para mostrar";
+    contenedorUsuarios.appendChild(mensaje);
   } else {
-    let usuariosTexto = "Usuarios registrados:\n";
+    curso.forEach((usuario, index) => {
+      const tarjeta = crearTarjetaUsuario(usuario, index);
+      contenedorUsuarios.appendChild(tarjeta);
+    });
+  }
+}
 
-    usuarios.forEach(usuario => {
-      usuariosTexto += `Nombre: ${usuario.nombre} (${usuario.email})\n`;
-      usuariosTexto += `Edad: ${usuario.edad}\n`;
-      usuariosTexto += `Monto del préstamo: $${usuario.montoPrestamo.toFixed(2)}\n`;
-      usuariosTexto += `Plazo del préstamo: ${usuario.plazo} meses\n`;
-      usuariosTexto += `Tasa de interés anual: ${usuario.tasaInteres}%\n`;
-      usuariosTexto += `Cuota mensual: $${usuario.cuotaMensual.toFixed(2)}\n\n`;
+// Función para crear una tarjeta con los datos del usuario
+function crearTarjetaUsuario(usuario, index) {
+  const tarjeta = document.createElement("div");
+  tarjeta.className = "card text-bg-dark mb-3";
+  tarjeta.style = "max-width: 18rem;";
+
+  const tarjetaHeader = document.createElement("div");
+  tarjetaHeader.className = "card-header";
+  tarjetaHeader.textContent = "Usuario";
+
+  const tarjetaBody = document.createElement("div");
+  tarjetaBody.className = "card-body";
+
+  const titulo = document.createElement("h5");
+  titulo.className = "card-title";
+  titulo.textContent = `${usuario.nombre} ${usuario.apellido}`;
+
+  const texto = document.createElement("p");
+  texto.className = "card-text";
+  texto.innerHTML = `DNI: ${usuario.dni}, Edad: ${usuario.edad}<br>
+                    Correo: ${usuario.email}<br>
+                    Tasa de interés: ${usuario.tasaInteres}%<br>
+                    Cuota mensual: $${usuario.cuotaMensual ? usuario.cuotaMensual.toFixed(2) : "N/A"}`;
+
+  const botonEliminar = document.createElement("button");
+  botonEliminar.className = "btn btn-danger";
+  botonEliminar.textContent = "Eliminar";
+  botonEliminar.addEventListener("click", () => eliminarUsuario(index));
+
+  tarjetaBody.appendChild(titulo);
+  tarjetaBody.appendChild(texto);
+  tarjetaBody.appendChild(botonEliminar);
+  tarjeta.appendChild(tarjetaHeader);
+  tarjeta.appendChild(tarjetaBody);
+
+  return tarjeta;
+}
+
+// Cargar datos del localStorage al array curso cuando se inicia la página
+cargarDesdeLocalStorage();
+listarUsuarios();
+
+// Evento para agregar un usuario cuando se presiona el botón
+document.getElementById("btnAgregar").addEventListener("click", agregarUsuario);
+
+// Evento para mostrar todos los usuarios cuando se presiona el botón
+document.getElementById("btnMostrarUsuarios").addEventListener("click", listarUsuarios);
+
+// Evento para ocultar la lista de usuarios cuando se presiona el botón
+document.getElementById("btnEsconderLista").addEventListener("click", esconderLista);
+
+// Evento para buscar un usuario por DNI
+document.getElementById("buscarDNI").addEventListener("input", buscarUsuarioPorDni);
+
+// Función para ocultar la lista de usuarios
+function esconderLista() {
+  const contenedorUsuarios = document.getElementById("usuariosContainer");
+  contenedorUsuarios.innerHTML = "";
+}
+
+// Función para buscar el usuario por DNI
+function buscarUsuarioPorDni() {
+  const dniBuscado = document.getElementById("buscarDNI").value;
+  const usuariosEncontrados = curso.filter((usuario) => usuario.dni === dniBuscado);
+
+  const contenedorUsuarios = document.getElementById("usuariosContainer");
+  contenedorUsuarios.innerHTML = "";
+
+  if (usuariosEncontrados.length > 0) {
+    usuariosEncontrados.forEach((usuario) => {
+      const tarjeta = crearTarjetaUsuario(usuario);
+      contenedorUsuarios.appendChild(tarjeta);
     });
 
-    alert(usuariosTexto);
+    document.getElementById("mensaje").textContent = "";
+  } else {
+    document.getElementById("mensaje").textContent = "No se encontró ningún usuario con ese DNI";
   }
-};
+}
 
-// Función para ejecutar el programa principal
-const ejecutarPrograma = () => {
-  let opcion;
+// Función para borrar el contenido del LocalStorage y el array curso
+function borrarLocalStorage() {
+  localStorage.removeItem("curso");
+  curso = [];
+  alert("Se ha borrado todo el contenido del LocalStorage");
+}
 
-  do {
-    opcion = prompt(`Seleccione una opción:
-    1. Registrar un nuevo usuario y calcular préstamo
-    2. Mostrar usuarios registrados
-    3. Salir`);
-
-    switch (opcion) {
-      case "1":
-        registrarYCalcularPrestamo();
-        break;
-      case "2":
-        mostrarUsuarios();
-        break;
-      case "3":
-        alert("Hasta luego!");
-        break;
-      default:
-        alert("No te pases de listo. Intente nuevamente.");
-        break;
-    }
-  } while (opcion !== "3");
-};
-
-ejecutarPrograma();
+// Cargar datos del localStorage al array curso cuando inicia
+cargarDesdeLocalStorage();
