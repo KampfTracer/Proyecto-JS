@@ -27,10 +27,15 @@ h1 {
 }
 
 form {
+  display:flex;
+  flex-direction: column; 
+  flex-wrap: wrap;
+  align-items: center;
   background-color: #ffffffd3;
   border-radius: 5px;
   padding: 100px;
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+
 }
 
 input[type="text"],
@@ -67,3 +72,91 @@ button:hover {
 
 }
 
+/*conversor de moneda*/
+.tituloConversor {
+  color: rgb(17, 17, 17);
+  background-color: rgba(179, 177, 177, 0.432);
+}
+
+
+
+.conversorDeMoneda{
+    font-family: Arial, Helvetica, sans-serif;
+    
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 50vh;
+    margin: 0;
+    padding: 100px;
+    margin-left: auto;
+    display:flex;
+  flex-wrap: wrap;
+}
+
+h1{
+    color: var(--primary-color);
+}
+
+p {
+    text-align: center;
+}
+
+.btn{
+    color: white;
+    background: rgb(230, 204, 59);
+    cursor: pointer;
+    border-radius: 5px;
+    font-size: 12px;
+    padding: 5px 12px;
+}
+
+.conversor-imagen{
+    width: 150px;
+}
+
+.moneda{
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.moneda select{
+    padding: 10px 20px 10px 10px;
+    border: 1px solid #dedede;
+    font-size: 16px;
+    -moz-appearance: none;
+    -webkit-appearance: none;
+    appearance: none;
+}
+
+.moneda input {
+    border: 0;
+    font-size: 30px;
+    text-align: right;
+}
+
+.taza-cambio-container{
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.cambio{
+    color: whitesmoke;
+    font-size: 14px;
+    padding: 0 10px;
+    font-weight: 600;
+}
+
+select:focus, input:focus, button:focus{
+    outline: 0;
+}
+
+@media (max-width:600px) {
+    .moneda input{
+        width: 200px;
+    }
+    
+}
